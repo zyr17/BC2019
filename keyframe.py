@@ -1,10 +1,12 @@
 from PIL import Image
 import numpy as np
 import pickle
+import readdata
+import os
 
 color_RGB_threshold = 16
 def similar_color_RGB(c1, c2):
-    #print(c1, c2, np.sqrt(np.square((c1 - c2)).mean()))
+    #print(c1, c2, np.sqrt(np.square((c1 - c2)).mean(axis=2)))
     return np.sqrt(np.square((c1 - c2)).mean(axis=2)) < color_RGB_threshold
 
 def near_similarity(img1, img2, dist):
@@ -57,16 +59,18 @@ def near_similarity(img1, img2, dist):
     return 1 - diff
     '''
 
-def is_similar(img1, img2, index = -1):
-    res = near_similarity(img1, img2, 1)
-    print(index, '%.6f' % res)
-    return res > 0.97
+def is_similar(imgarr):
+    res = []
+    imgarr = np.array(imgarr, dtype='int32')
+    for num, [i1, i2] in enumerate(zip(imgarr[:-1], imgarr[1:])):
+        res.append([num, near_similarity(i1, i2, 0)])
+    res.sort(key = lambda x : x[1])
+    print('\n'.join([str(x[0]) + ' ' + str(x[1]) for x in res]))
 
 if __name__ == '__main__':
-    
-    imgs = np.array(pickle.load(open('data/pickle/img.pkl', 'rb')), dtype='int32')[:]
-    res = []
-    for num, [i1, i2] in enumerate(zip(imgs[:-1], imgs[1:])):
-        if not is_similar(i1, i2, num):
-            res.append(num + 1)
-    print(' '.join([str(x) for x in res]))
+    videofolder = 'data/douyin/'
+    framesfolder = 'data/frames/'
+    for file in os.listdir(videofolder):
+        readdata.video2img(videofolder + file, framesfolder)
+        is_similar(readdata.readimgs(framesfolder))
+        input()
