@@ -5,7 +5,7 @@ from PIL import Image
 import json
 
 def video2img(videoname, savefolder, cutstart = 0, cutend = 0):
-    os.system('rm -r %s*' % savefolder)
+    os.system('rm %s*' % savefolder)
     if cutend != 0:
         t = getprobe(videoname)[0] - cutstart - cutend
         ffmpeg.input(videoname).output(savefolder + '%06d.jpg', ss = cutstart, t = t).run(quiet = True, overwrite_output = True)
