@@ -8,15 +8,18 @@ def video2img(videoname, savefolder, cutstart = 0, cutend = 0):
     os.system('rm %s*' % savefolder)
     if cutend != 0:
         t = getprobe(videoname)[0] - cutstart - cutend
-        ffmpeg.input(videoname).output(savefolder + '%06d.jpg', ss = cutstart, t = t).run(quiet = True, overwrite_output = True)
+        ffmpeg.input(videoname).output(savefolder + '%06d.jpg', ss = cutstart, t = t, r = 30).run(quiet = True, overwrite_output = True)
         return
-    ffmpeg.input(videoname).output(savefolder + '%06d.jpg').run(quiet = True, overwrite_output = True)
+    ffmpeg.input(videoname).output(savefolder + '%06d.jpg', r = 30).run(quiet = True, overwrite_output = True)
 
-def readimgs(savefolder):
+def readimgs(savefolder, size = None):
     imgs = os.listdir(savefolder)
     res = []
     for file in imgs:
-        img = np.array(Image.open(savefolder + file))
+        img = Image.open(savefolder + file)
+        if size != None:
+            img = img.resize(size, Image.ANTIALIAS)
+        img = np.array(img)
         #print(img.shape, img.dtype)
         res.append(img)
     res = np.stack(res)

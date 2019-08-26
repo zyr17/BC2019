@@ -71,7 +71,7 @@ def is_similar_near(imgarr, MIN_KEY_FRAME = 20, NEAR_THRESHOLD = 0.8):
     res = []
     imgarr = np.array(imgarr, dtype='int32')
     for num, [i1, i2] in enumerate(zip(imgarr[:-1], imgarr[1:])):
-        res.append([num, near_similarity(i1, i2, 0)])
+        res.append([num, near_similarity(i1, i2, 1)])
     res.sort(key = lambda x : x[1])
     #print('\n'.join([str(x[0]) + ' ' + str(x[1]) for x in res]))
     for i in range(len(res)):
@@ -119,7 +119,7 @@ if __name__ == '__main__':
     random.shuffle(files)
     for file in files:
         readdata.video2img(videofolder + file, framesfolder)
-        imgs = readdata.readimgs(framesfolder)
+        imgs = readdata.readimgs(framesfolder, (64, 64))
         if len(imgs) > 600:
             continue
 
