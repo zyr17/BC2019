@@ -4,11 +4,13 @@ import pickle
 import readdata
 import os
 import random
+import time
 
 def saveimage(savefolder, res, imgs, saveorder = False):
     res = [[-1, 0.0]] + res
     if os.path.exists(savefolder):
-        os.system('rm %s*' % savefolder)
+        if len(os.listdir(savefolder)) > 0:
+            os.system('rm %s*' % savefolder)
     else:
         os.mkdir(savefolder)
     for num, [i, j] in enumerate(res):
@@ -83,7 +85,7 @@ def is_similar_near(imgarr, MIN_KEY_FRAME = 20, NEAR_THRESHOLD = 0.8):
             return res[:i]
     return res
 
-def localdiff(nowdiff, frame = 50, max = 0.2, delta = 0.5, similar = 0.995, top = 0.05):
+def localdiff(nowdiff, frame = 50, max = 0.2, delta = 0.5, similar = 0.99, top = 0.05):
     frame //= 2
     topnum = int(len(nowdiff) * top)
     diffwithid = list(zip(range(len(nowdiff)), nowdiff))
@@ -153,7 +155,29 @@ def is_similar_histogram(imgarr, mixarr = np.array([0.299, 0.587, 0.114]), norm 
     return res
     '''
 
+def extractallkeyframe(dataf, destf, tmpf):
+    if not os.path.exists(tmpf):
+        os.mkdir(tmpf)
+    if not os.path.exists(destf):
+        os.mkdir(destf)
+    files = os.listdir(dataf)
+    lasttime = time.time()
+    for num, file in enumerate(files):
+        readdata.video2img(dataf + file, tmpf)
+        imgs, original = readdata.readimgs(tmpf, (64, 64))
+        dest = destf + file[:-4] + '/'
+        hsvimgs = RGB2HSV(imgs)
+        res = is_similar_histogram(hsvimgs, np.array([1, 0, 0]))
+        #print('\n'.join([str(x[0]) + ' ' + str(x[1]) for x in res]))
+        saveimage(dest, res, original)
+        print(file)
+        if num % 50 == 0:
+            print(str(num) + '/' + str(len(files)), time.time() - lasttime)
+            lasttime = time.time()
+
+
 if __name__ == '__main__':
+    '''
     videofolder = 'data/douyin/'
     framesfolder = 'data/frames/'
     files = os.listdir(videofolder)
@@ -175,9 +199,11 @@ if __name__ == '__main__':
 
         print('start hsvhistogram')
         hsvimgs = RGB2HSV(imgs)
-        res = is_similar_histogram(imgs, np.array([1, 0, 0]))
+        res = is_similar_histogram(hsvimgs, np.array([1, 0, 0]))
         print('\n'.join([str(x[0]) + ' ' + str(x[1]) for x in res]))
         saveimage('data/results/hhistogram/', res, original)
 
         print(file, 'over')
         input()
+    '''
+    extractallkeyframe('data/douyin/', 'data/results/keyframes/', 'data/frames/')
