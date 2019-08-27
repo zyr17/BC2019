@@ -163,17 +163,19 @@ def extractallkeyframe(dataf, destf, tmpf):
     files = os.listdir(dataf)
     lasttime = time.time()
     for num, file in enumerate(files):
-        readdata.video2img(dataf + file, tmpf)
-        imgs, original = readdata.readimgs(tmpf, (64, 64))
-        dest = destf + file[:-4] + '/'
-        hsvimgs = RGB2HSV(imgs)
-        res = is_similar_histogram(hsvimgs, np.array([1, 0, 0]))
-        #print('\n'.join([str(x[0]) + ' ' + str(x[1]) for x in res]))
-        saveimage(dest, res, original)
         print(file)
         if num % 50 == 0:
             print(str(num) + '/' + str(len(files)), time.time() - lasttime)
             lasttime = time.time()
+        dest = destf + file[:-4] + '/'
+        if os.path.exists(dest) and len(os.listdir(dest)) > 0:
+            continue
+        readdata.video2img(dataf + file, tmpf)
+        imgs, original = readdata.readimgs(tmpf, (64, 64))
+        hsvimgs = RGB2HSV(imgs)
+        res = is_similar_histogram(hsvimgs, np.array([1, 0, 0]))
+        #print('\n'.join([str(x[0]) + ' ' + str(x[1]) for x in res]))
+        saveimage(dest, res, original)
 
 
 if __name__ == '__main__':

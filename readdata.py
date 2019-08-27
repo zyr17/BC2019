@@ -39,6 +39,9 @@ def getprobe(videoname):
             y = int(s['height'])
     return length, fps, frames, x, y
 
+def to240p30f(src, dest):
+    ffmpeg.input(src).output(dest, vf = 'scale=240:424', r = 30)
+
 def makechange(src, dest, changetype):
     video = ffmpeg.input(src)
     length, fps, frames, x, y = getprobe(src)
