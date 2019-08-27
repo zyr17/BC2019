@@ -5,14 +5,18 @@ import readdata
 import os
 import random
 
-def saveimage(savefolder, res, imgs):
+def saveimage(savefolder, res, imgs, saveorder = False):
+    res = [[-1, 0.0]] + res
     if os.path.exists(savefolder):
         os.system('rm %s*' % savefolder)
     else:
         os.mkdir(savefolder)
     for num, [i, j] in enumerate(res):
         img = imgs[i + 1]
-        Image.fromarray(img).save(savefolder + '%03d-%06d.jpg' % (num, i))
+        if saveorder:
+            Image.fromarray(img).save(savefolder + '%03d-%06d.jpg' % (num, i + 2))
+        else:
+            Image.fromarray(img).save(savefolder + '%06d.jpg' % (i + 2))
 
 def RGB2HSV(a):
     a = np.array(a, dtype='int32')
@@ -79,6 +83,39 @@ def is_similar_near(imgarr, MIN_KEY_FRAME = 20, NEAR_THRESHOLD = 0.8):
             return res[:i]
     return res
 
+def localdiff(nowdiff, frame = 50, max = 0.2, delta = 0.5, similar = 0.995, top = 0.05):
+    frame //= 2
+    topnum = int(len(nowdiff) * top)
+    diffwithid = list(zip(range(len(nowdiff)), nowdiff))
+    diffwithid.sort(key=lambda x:x[1])
+    biggest = np.zeros(len(nowdiff), dtype='bool')
+    for i in range(topnum):
+        biggest[diffwithid[i][0]] = True
+    #print(biggest)
+    #不要全局较小，完全局部性判断
+    #biggest = True
+    nowdiff = np.array(nowdiff, dtype='float')
+    res = []
+    for i in range(len(nowdiff)):
+        if not biggest[i] or similar < nowdiff[i]:
+            continue
+        left = 0
+        right = len(nowdiff)
+        if left < i - frame:
+            left = i - frame
+        if right > i + frame:
+            right = i + frame
+        part = np.array(nowdiff[left:right])
+        center = i - left
+        #print(part.min(), part.max(), end='')
+        part -= part.min()
+        part /= part.max()
+        #print(i, part)
+        if center > 0 and part[center - 1] - part[center] > delta and part[center] < max:
+            res.append([i, nowdiff[i]])
+    return res
+
+
 def hist_similarity(img1, img2, norm = False):
     if norm:
         hist1, _1 = np.histogram(img1.reshape(-1), 256)
@@ -105,12 +142,16 @@ def is_similar_histogram(imgarr, mixarr = np.array([0.299, 0.587, 0.114]), norm 
     imgarr = np.array(imgarr.dot(mixarr), dtype='int32')
     for num, [i1, i2] in enumerate(zip(imgarr[:-1], imgarr[1:])):
         res.append([num, hist_similarity(i1, i2, norm)])
+    res = localdiff([x[1] for x in res])
+    return res
+    '''
     res.sort(key = lambda x : x[1])
     #print('\n'.join([str(x[0]) + ' ' + str(x[1]) for x in res]))
     for i in range(len(res)):
         if i >= MIN_KEY_FRAME and res[i][0] >= NEAR_THRESHOLD:
             return res[:i]
     return res
+    '''
 
 if __name__ == '__main__':
     videofolder = 'data/douyin/'
@@ -118,26 +159,25 @@ if __name__ == '__main__':
     files = os.listdir(videofolder)
     random.shuffle(files)
     for file in files:
+        #file = '6629600868192750855.mp4'
         readdata.video2img(videofolder + file, framesfolder)
-        imgs = readdata.readimgs(framesfolder, (64, 64))
-        if len(imgs) > 600:
-            continue
+        imgs, original = readdata.readimgs(framesfolder, (64, 64))
 
         print('start rgbnear')
         res = is_similar_near(imgs)
         print('\n'.join([str(x[0]) + ' ' + str(x[1]) for x in res]))
-        saveimage('data/results/rgbnear/', res, imgs)
+        saveimage('data/results/rgbnear/', res, original, True)
         
         print('start rgbhistogram')
         res = is_similar_histogram(imgs, norm = True)
         print('\n'.join([str(x[0]) + ' ' + str(x[1]) for x in res]))
-        saveimage('data/results/rgbhistogram/', res, imgs)
+        saveimage('data/results/rgbhistogram/', res, original)
 
         print('start hsvhistogram')
         hsvimgs = RGB2HSV(imgs)
         res = is_similar_histogram(imgs, np.array([1, 0, 0]))
         print('\n'.join([str(x[0]) + ' ' + str(x[1]) for x in res]))
-        saveimage('data/results/hhistogram/', res, imgs)
+        saveimage('data/results/hhistogram/', res, original)
 
         print(file, 'over')
         input()
