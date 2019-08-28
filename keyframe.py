@@ -177,6 +177,20 @@ def extractallkeyframe(dataf, destf, tmpf):
         #print('\n'.join([str(x[0]) + ' ' + str(x[1]) for x in res]))
         saveimage(dest, res, original)
 
+#输入：视频名称 输出：[[关键帧] [帧号]]
+def keyframe(src, tmpf = 'data/frames/'):
+    readdata.video2img(src, tmpf)
+    imgs, original = readdata.readimgs(tmpf, (64, 64))
+    hsvimgs = RGB2HSV(imgs)
+    res = is_similar_histogram(hsvimgs, np.array([1, 0, 0]))
+    res = [x[0] for x in res]
+    kf = []
+    framenum = []
+    for one in [-1] + res:
+        kf.append(original[one + 1])
+        framenum.append(one + 2)
+    kf = np.stack(kf)
+    return kf, framenum
 
 if __name__ == '__main__':
     '''
@@ -208,4 +222,6 @@ if __name__ == '__main__':
         print(file, 'over')
         input()
     '''
-    extractallkeyframe('data/douyin/', 'data/results/keyframes/', 'data/frames/')
+    #extractallkeyframe('data/douyin/', 'data/results/keyframes/', 'data/frames/')
+    x, y = keyframe('data/douyin/6510522419826920717.mp4')
+    print(y)

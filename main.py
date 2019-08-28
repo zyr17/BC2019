@@ -1,10 +1,10 @@
 
 
 #输入：文件名 输出：[[相似视频 相似度]...]
-def videores(src):
+def videores(src, tmp = 'data/tmp.mp4'):
     #TODO: 不用文件交互
-    readdata.to240p30f(src)
-    kf = keyframe.keyframe(src)
+    readdata.to240p30f(src, tmp)
+    kf, kfnum = keyframe.keyframe(tmp)
     hashs = hash.calchash(kf)
     return video.videomain(hashs)
     
@@ -16,4 +16,7 @@ def main(src):
     if md5res != None:
         return [[md5res, 1], [md5res, 1], [md5res, 1]]
     vr = videores(src)
+    ar = audiores(src)
 
+if __name__ == '__main__':
+    main('data/input.mp4')
