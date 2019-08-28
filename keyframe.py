@@ -183,6 +183,7 @@ def keyframe(src, tmpf = 'data/frames/'):
     imgs, original = readdata.readimgs(tmpf, (64, 64))
     hsvimgs = RGB2HSV(imgs)
     res = is_similar_histogram(hsvimgs, np.array([1, 0, 0]))
+    print(res)
     res = [x[0] for x in res]
     kf = []
     framenum = []
@@ -225,3 +226,10 @@ if __name__ == '__main__':
     #extractallkeyframe('data/douyin/', 'data/results/keyframes/', 'data/frames/')
     x, y = keyframe('data/douyin/6510522419826920717.mp4')
     print(y)
+    videofolder = 'data/douyin/'
+    files = os.listdir(videofolder)
+    for i in range(10000):
+        file = files[random.randint(0, len(files) - 1)]
+        makechange(videofolder + file, 'data/convert.mp4', ['gauss', 0.5, 6])
+        x, y = keyframe('data/convert.mp4')
+        base = [int(x[:-4]) for x in os.listdir('data/results/keyframes/')]
