@@ -224,12 +224,32 @@ if __name__ == '__main__':
         input()
     '''
     #extractallkeyframe('data/douyin/', 'data/results/keyframes/', 'data/frames/')
-    x, y = keyframe('data/douyin/6510522419826920717.mp4')
-    print(y)
+    #x, y = keyframe('data/douyin/6510522419826920717.mp4')
+    #print(y)
     videofolder = 'data/douyin/'
     files = os.listdir(videofolder)
     for i in range(10000):
         file = files[random.randint(0, len(files) - 1)]
-        makechange(videofolder + file, 'data/convert.mp4', ['gauss', 0.5, 6])
+        print(file)
+        readdata.makechange(videofolder + file, 'data/convert.mp4', ['resolution', 0.7, 0.7])
         x, y = keyframe('data/convert.mp4')
-        base = [int(x[:-4]) for x in os.listdir('data/results/keyframes/')]
+        #x, y = keyframe(videofolder + file)
+        base = [int(x[:-4]) for x in os.listdir('data/results/keyframes/' + file[:-4])]
+        bu = [0] * 3000
+        for j in y:
+            bu[j] += 1
+        for j in base:
+            bu[j] += 1
+        same = []
+        diff = []
+        for num in range(len(bu)):
+            if bu[num] == 2:
+                same.append(num)
+            elif bu[num] == 1:
+                diff.append(num)
+        if len(diff) > 0:
+            print(y)
+            print(base)
+            print(same)
+            print(diff)
+            input()

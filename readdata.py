@@ -48,7 +48,7 @@ def makechange(src, dest, changetype):
     length, fps, frames, x, y = getprobe(src)
     if changetype[0] == 'resolution':
         xx = int(x * changetype[1]) // 2 * 2
-        yy = int(y * changetype[1]) // 2 * 2
+        yy = int(y * changetype[2]) // 2 * 2
         video = video.output(dest, vf = 'scale=%d:%d' % (xx, yy))
     elif changetype[0] == 'fps':
         video = video.output(dest, r = changetype[1])
@@ -65,7 +65,7 @@ def makechange(src, dest, changetype):
         w, h, x1, y1 = changetype[1:]
         video = video.output(dest, vf = 'pad=%d:%d:%d:%d' % (int(w * x), int(h * y), int(x * x1), int(y * y1)))
     
-    video.run(quiet = False, overwrite_output = True)
+    video.run(quiet = True, overwrite_output = True)
 
 if __name__ == '__main__':
     '''
