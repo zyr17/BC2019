@@ -1,9 +1,9 @@
 import os
 import pandas
-import vhash
+import knn
 import numpy as np
 
-def videocandidate(vhashs, cap = 0.5):
+def videocandidate(vhashs, cap = 0.3):
     tot = len(vhashs)
     '''
     res = []
@@ -11,8 +11,11 @@ def videocandidate(vhashs, cap = 0.5):
         res.append(index.knn(vh, 10))
     res = np.array(res)
     '''
-    res = vhash.knn(vhashs, 10)
+    res = knn.KNN(vhashs, 10)
+    res = np.array(res)
+    #print(res)
     vc = pandas.Series(res.reshape(-1)).value_counts()
+    print(vc)
     return np.array(vc[vc > cap * tot].index)
 
 def videosimilarity1(data1, data2):
@@ -29,16 +32,15 @@ def videosimilarity1(data1, data2):
     return (sim[len(sim) // 2] + sim[(len(sim) - 1) // 2]) / 2
 
 def videosimilarity(vhashs, ovc):
-    sim = []
-    for vh in vhashs:
-        dist = vhash.dist(vhashs, ovc)
-        sim.append(dist)
+    sim = list(map(lambda x:x[0], knn.value(vhashs, ovc[:19])))
+    print(sim)
     sim.sort()
     return (sim[len(sim) // 2] + sim[(len(sim) - 1) // 2]) / 2
 
 def videomain(vhashs, CAP = 0.8):
     res = []
-    vc = videocandidate(vhashs)
+    vc = list(map(lambda x:x[:19], videocandidate(vhashs)))
+    print(vc)
     for ovc in vc:
         s = videosimilarity(vhashs, ovc)
         if s > CAP:

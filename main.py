@@ -1,17 +1,18 @@
 import readdata
 import video
 import keyframe
-import vhash
 import check_md5
 import recognize
+import fingerprint
 
 #输入：文件名 输出：[[相似视频 相似度]...]
 def videores(src, tmp = 'data/tmp.mp4'):
     #TODO: 不用文件交互
     readdata.to240p30f(src, tmp)
     kf, kfnum = keyframe.keyframe(tmp)
-    hashs = vhash.calchash(kf)
-    #print('hashs', hashs)
+    print(kfnum)
+    hashs = fingerprint.fingerprint(kf)
+    #print('hashs', len(hashs[0][0]), len(hashs[0][1]), len(hashs[0][2]))
     return video.videomain(hashs)
     
 #输入：文件名 输出：[[相似视频 相似度]...]
