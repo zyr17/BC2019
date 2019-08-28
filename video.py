@@ -22,3 +22,12 @@ def videosimilarity(data1, data2):
         sim.append(smallest)
     sim.sort()
     return (sim[len(sim) // 2] + sim[(len(sim) - 1) // 2]) / 2
+
+def videomain(vhashs, CAP = 0.8):
+    res = []
+    vc = videocandidate(vhashs)
+    for ovc in vc:
+        s = videosimilarity(vhashs, ovc)
+        if s > CAP:
+            res.append([ovc, s])
+    return res
