@@ -1,16 +1,21 @@
 import os
 import pandas
+import vhash
+import numpy as np
 
 def videocandidate(vhashs, cap = 0.5):
     tot = len(vhashs)
+    '''
     res = []
     for vh in vhashs:
         res.append(index.knn(vh, 10))
     res = np.array(res)
+    '''
+    res = vhash.knn(vhashs, 10)
     vc = pandas.Series(res.reshape(-1)).value_counts()
-    return np.array(cv[cv > cap * tot].index)
+    return np.array(vc[vc > cap * tot].index)
 
-def videosimilarity(data1, data2):
+def videosimilarity1(data1, data2):
     sim = []
     for i in data1:
         smallest = 1e100
@@ -20,6 +25,14 @@ def videosimilarity(data1, data2):
             if smallest > dist:
                 smallest = dist
         sim.append(smallest)
+    sim.sort()
+    return (sim[len(sim) // 2] + sim[(len(sim) - 1) // 2]) / 2
+
+def videosimilarity(vhashs, ovc):
+    sim = []
+    for vh in vhashs:
+        dist = vhash.dist(vhashs, ovc)
+        sim.append(dist)
     sim.sort()
     return (sim[len(sim) // 2] + sim[(len(sim) - 1) // 2]) / 2
 

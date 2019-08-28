@@ -40,7 +40,7 @@ def getprobe(videoname):
     return length, fps, frames, x, y
 
 def to240p30f(src, dest):
-    ffmpeg.input(src).output(dest, vf = 'scale=240:424', r = 30)
+    ffmpeg.input(src).output(dest, vf = 'scale=240:424', r = 30).run(quiet = True, overwrite_output = True)
 
 def makechange(src, dest, changetype):
     video = ffmpeg.input(src)
