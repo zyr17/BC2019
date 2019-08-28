@@ -15,6 +15,7 @@ def video2img(videoname, savefolder, cutstart = 0, cutend = 0):
 
 def readimgs(savefolder, size = None):
     imgs = os.listdir(savefolder)
+    imgs.sort()
     res = []
     original = []
     for file in imgs:
