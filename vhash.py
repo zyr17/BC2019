@@ -4,7 +4,7 @@ def dist(a, b):
     return 100
 
 def knn(vhashs, k):
-    return np.array(list(range(k)))
+    return np.array([list(range(k))] * len(vhashs))
 
 def calchash(mat):
     return np.array([0] * mat.shape[0])
