@@ -19,10 +19,15 @@ def videores(src, tmp = 'data/tmp.mp4'):
 def audiores(src):
     return recognize.recognize_mp4(src)
 
-#输入：待测视频文件名 输出：[[[总相似文件名 相似度]...][[视频相似 相似度]...][[音频相似 相似度]...]]
-def main(src):
+#输入：待测视频文件名 变换参数(如果要变换)
+#输出：[[[总相似文件名 相似度]...][[视频相似 相似度]...][[音频相似 相似度]...]]
+def main(src, mc = None):
+    if mc != None:
+        readdata.makechange(src, src + '.convert', mc)
+        src += '.convert'
     md5res = check_md5.check_md5_exists(src)
     print(md5res)
+    #TODO: 正式时删去False
     if False and md5res != None and md5res != '':
         return [[[md5res, 1]], [[md5res, 1]], [[md5res, 1]]]
     vr = videores(src)
