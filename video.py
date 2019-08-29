@@ -12,9 +12,9 @@ def videocandidate(vhashs, cap = 0.3):
     res = np.array(res)
     '''
     res = knn.KNN(vhashs, 10)
-    res = np.array(res)
+    res = [x[:19] for x in np.array(res).reshape(-1)]
     #print(res)
-    vc = pandas.Series(res.reshape(-1)).value_counts()
+    vc = pandas.Series(res).value_counts()
     print(vc)
     return np.array(vc[vc > cap * tot].index)
 
