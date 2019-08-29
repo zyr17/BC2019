@@ -38,5 +38,8 @@ def main(src, mc = None):
     return [[], vr, ar]
 
 if __name__ == '__main__':
-    res = main('data/input.mp4')
+    filename = input().strip()
+    if filename == '':
+        filename = 'data/input.mp4'
+    res = main(filename)
     print(res)

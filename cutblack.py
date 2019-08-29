@@ -1,7 +1,25 @@
 import numpy as np
 from PIL import Image
-
 def cutblack(imgs, size = (240, 426), cap = 16):
+    res = []
+    for img in imgs:
+        mask = (img > cap).min(axis=2)
+        mask_col=mask.max(axis=0)
+        mask_row = mask.max(axis=1)
+        L = np.arange(len(mask_col))
+        L_mask = L[mask_col]
+        L_mask = np.arange(1) if len(L_mask) == 0 else L_mask
+        t, d = L_mask[0], L_mask[-1]
+        L = np.arange(len(mask_row))
+        L_mask = L[mask_row]
+        L_mask = np.arange(1) if len(L_mask) == 0 else L_mask
+        l, r = L_mask[0], L_mask[-1]
+        img = img[l:r+1,t:d+1]
+        img = Image.fromarray(img).resize(size, Image.ANTIALIAS)
+        res.append(np.array(img))
+    return np.stack(res)
+
+def cutblack1(imgs, size = (240, 426), cap = 16):
     res = []
     for img in imgs:
         x1 = 999999
