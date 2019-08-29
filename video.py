@@ -45,4 +45,5 @@ def videomain(vhashs, CAP = 0.8):
         s = videosimilarity(vhashs, ovc)
         if s > CAP:
             res.append([ovc, s])
+    res.sort(key=lambda x:x[1])
     return res
